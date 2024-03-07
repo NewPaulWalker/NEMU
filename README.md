@@ -180,13 +180,14 @@ For baremetal app, [Abstract Machine](https://github.com/OpenXiangShan/nexus-am)
 Common simple apps like coremark and dhrystone can be built with Abstract Machine.
 
 For build operating system image,
-please read [the doc to build Linux](https://xiangshan-doc.readthedocs.io/zh-cn/latest/tools/linux-kernel-for-xs/).
+Please read [the doc to build Linux](https://xiangshan-doc.readthedocs.io/zh-cn/latest/tools/linux-kernel-for-xs/).
 
-### Boot image with NEMU with SimPoint profiling
+Then modify `NEMU_HOME` and `BBL_PATH` in `$NEMU_HOME/scripts/checkpoint_example/checkpoint_env.sh` and the workload parameter passed to the function in each example script to get started.
 
-### Build SimPoint and cluster BBV with SimPoint
 
-### Boot image with NEMU to produce checkpoints
+### SimPoint profiling and checkpoint
+
+Please read [the doc to generate checkpoint](https://xiangshan-doc.readthedocs.io/zh-cn/latest/tools/simpoint/)
 
 ### Run a checkpoint with XS-GEM5 or Xiangshan processor
 
@@ -197,7 +198,6 @@ Run a checkpoint with Xiangshan processor
 ```
 
 Run checkpoints with XS-GEM5: [the doc to run XS-GEM5](https://github.com/OpenXiangShan/GEM5?tab=readme-ov-file#run-gem5)
-
 
 ## FAQ
 
