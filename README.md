@@ -139,6 +139,14 @@ checkpoints-->run
 
 ## Howto
 
+### Install dependencies
+
+Because different distributions have different package management tools, the installation commands are different.
+For Ubuntu, users can install the dependencies with the following command:
+```bash
+apt install build-essential man gcc gdb git libreadline-dev libsdl2-dev zstd libzstd-dev
+```
+
 ### Use NEMU as reference design
 
 #### Build reference.so
