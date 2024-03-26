@@ -336,6 +336,10 @@ config PERF_OPT
   bool "Performance optimization"
   default y
 
+config FUZZING
+  bool "Run fuzzing test"
+  default n
+
 if PERF_OPT
 config TCACHE_SIZE
   int "Number of entries in trace cache"
