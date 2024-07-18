@@ -33,6 +33,31 @@ uint64_t get_abs_instr_count();
 
 rtlreg_t csr_array[4096] = {};
 
+#ifdef CONFIG_RVH
+// v : priv mode : csr priv 
+bool access_table[2][4][4] = {
+  {
+    {true, false, false, false},
+    {true, true, true, false},
+    {false, false, false, false},
+    {true, true, true, true}
+  },
+  {
+    {true, false, false, false},
+    {true, true, false, false},
+    {false, false, false, false},
+    {false, false, false, false},
+  }
+};
+#else
+// priv mode : csr priv
+bool access_table[4][4] = {
+  {true, false, false, false},
+  {true, true, false, false},
+  {false, false, false, false},
+  {true, true, true, true}
+}
+#endif
 
 #define CSRS_DEF(name, addr) \
   concat(name, _t)* const name = (concat(name, _t) *)&csr_array[addr];
@@ -106,20 +131,23 @@ static inline void csr_is_legal(uint32_t addr, bool need_write, bool exception_b
     exception_buffer[EX_II] = true;
 #endif
   // Attempts to access a CSR without appropriate privilege level
-  // TODO: complete priv check
-  int lowest_access_priv_level = (addr & 0b11 << 8) >> 8; // addr(9,8)
+  int csr_priv = (addr & 0b11 << 8) >> 8; // get csr priv from csr addr
 #ifdef CONFIG_RVH
-  int priv = cpu.mode == MODE_S ? MODE_HS : cpu.mode;
-  if(priv < lowest_access_priv_level){
-    if(cpu.v && lowest_access_priv_level <= MODE_HS)
-      exception_buffer[EX_VI] = true;
-    exception_buffer[EX_II] = true;
-  }
+  bool check_pass = access_table[cpu.v][cpu.mode][csr_priv];
 #else
-  if (!(cpu.mode >= lowest_access_priv_level)) {
-     exception_buffer[EX_II] = true;
+  bool check_pass = access_table[cpu.mode][csr_priv];
+#endif  // CONFIG_RVH
+  if (!check_pass) {
+#ifdef CONFIG_RVH
+    if (cpu.v && (cpu.mode == MODE_S) && (csr_priv == MODE_HS)) 
+      exception_buffer[EX_VI] = true; // vs access h|vs
+    else
+      exception_buffer[EX_II] = true;
+#else
+    exception_buffer[EX_II] = true;
+#endif  // CONFIG_RVH
   }
-#endif
+  
   // TODO: move this out of csr_is_legal
   // or to write a read-only register also raise illegal instruction exceptions.
   if (need_write && (addr >> 10) == 0x3) {
