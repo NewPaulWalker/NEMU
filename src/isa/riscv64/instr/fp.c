@@ -76,10 +76,18 @@ void isa_fp_set_ex(uint32_t ex) {
 
 void isa_fp_csr_check() {
 #ifndef CONFIG_FPU_NONE
+  // any mode execute flaot instruction when mstatus.fs = 0 will cause EX_II
   if(unlikely(mstatus->fs == 0)){
     longjmp_exception(EX_II);
     assert(0);
   }
+  #ifdef CONFIG_RVH
+  // VS/VU execute float instruction when sstatus.fs = 0/vsststus.fs = 0 will cause EX_II
+  if (cpu.v && cpu.mode < MODE_M && \
+    (sstatus->fs == 0 || (hstatus->vsxl == 1 ? vsstatus->_32.fs : vsstatus->_64.fs) == 0)){
+    longjmp_exception(EX_II);
+  }
+  #endif
 #endif // CONFIG_FPU_NONE
 }
 
